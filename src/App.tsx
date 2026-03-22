@@ -1,22 +1,18 @@
 import { useState, useEffect } from 'react';
-import { initSDK, getAccelerationMode } from './runanywhere';
-import { ChatTab } from './components/ChatTab';
-import { Sidebar } from './components/Sidebar';
+import { ModelCategory } from '@runanywhere/web';
+import { initSDK } from './runanywhere';
+import { DevMode } from './modes/DevMode';
+import { ResearchMode } from './modes/ResearchMode';
+import { ModelBanner } from './components/ModelBanner';
+import { useModelLoader } from './hooks/useModelLoader';
 
-type Tab = 'chat';
-
-function getPageHeading(pathname: string): string {
-  if (pathname === '/research') return 'research heading chatbot';
-  if (pathname === '/dev') return 'dev mode chatbot heading';
-  return 'home page chatbot';
-}
+let appLevelModelEnsurePromise: Promise<boolean> | null = null;
 
 export function App() {
   const [sdkReady, setSdkReady] = useState(false);
   const [sdkError, setSdkError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<Tab>('chat');
-  const [currentPath, setCurrentPath] = useState(window.location.pathname);
-  const [heading, setHeading] = useState(getPageHeading(window.location.pathname));
+  const [mode, setMode] = useState<'dev' | 'research' | null>(null);
+  const loader = useModelLoader(ModelCategory.Language);
 
   useEffect(() => {
     initSDK()
@@ -25,20 +21,11 @@ export function App() {
   }, []);
 
   useEffect(() => {
-    const updateHeading = () => {
-      const newPath = window.location.pathname;
-      setCurrentPath(newPath);
-      setHeading(getPageHeading(newPath));
-    };
-    window.addEventListener('popstate', updateHeading);
-    return () => window.removeEventListener('popstate', updateHeading);
-  }, []);
-
-  const handleNavigate = (path: string) => {
-    window.history.pushState(null, '', path);
-    setCurrentPath(path);
-    setHeading(getPageHeading(path));
-  };
+    if (sdkReady) {
+      // Start model loading once at app startup so mode switches do not re-trigger downloads.
+      appLevelModelEnsurePromise ??= loader.ensure();
+    }
+  }, [loader.ensure, sdkReady]);
 
   if (sdkError) {
     return (
@@ -59,27 +46,154 @@ export function App() {
     );
   }
 
-  const accel = getAccelerationMode();
+  // Mode selection
+  if (!mode) {
+    return (
+      <div>
+        <ModelBanner
+          state={loader.state}
+          progress={loader.progress}
+          error={loader.error}
+          onLoad={loader.ensure}
+          label="LLM"
+        />
+        <div style={{ padding: '60px 20px', textAlign: 'center', maxWidth: '600px', margin: '0 auto' }}>
+          <h1 style={{ fontSize: '36px', marginBottom: '12px' }}>DocuMentor</h1>
+          <p style={{ fontSize: '18px', color: '#666', marginBottom: '40px' }}>
+            Your documents. Your device. Your AI.
+          </p>
+          <p style={{ color: '#999', marginBottom: '40px' }}>
+            Choose a mode to analyze your documents with on-device AI. Zero backend. 100% private.
+          </p>
+
+          <div style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
+            <button
+              onClick={() => setMode('dev')}
+              style={{
+                padding: '20px 40px',
+                backgroundColor: '#2563EB',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '16px',
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              Dev Mode
+            </button>
+            <button
+              onClick={() => setMode('research')}
+              style={{
+                padding: '20px 40px',
+                backgroundColor: '#10B981',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '16px',
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              Research Mode
+            </button>
+          </div>
+
+          <p style={{ marginTop: '40px', fontSize: '12px', color: '#999' }}>
+            <button
+              onClick={() => setMode(null)}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#2563EB',
+                cursor: 'pointer',
+                textDecoration: 'underline',
+                fontSize: '12px',
+              }}
+            >
+              Back
+            </button>
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (mode === 'dev') {
+    return (
+      <div style={{ height: '100vh', overflow: 'auto' }}>
+        <ModelBanner
+          state={loader.state}
+          progress={loader.progress}
+          error={loader.error}
+          onLoad={loader.ensure}
+          label="LLM"
+        />
+        <header
+          style={{
+            padding: '16px 20px',
+            backgroundColor: 'white',
+            borderBottom: '1px solid #E5E7EB',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <h1 style={{ margin: 0, fontSize: '20px' }}>Dev Mode</h1>
+          <button
+            onClick={() => setMode(null)}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: '#F3F4F6',
+              border: '1px solid #D1D5DB',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '14px',
+            }}
+          >
+            Change Mode
+          </button>
+        </header>
+        <DevMode />
+      </div>
+    );
+  }
 
   return (
-    <div className="app">
-      <Sidebar currentPath={currentPath} onNavigate={handleNavigate} />
-      <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-        <header className="app-header">
-          <h1>{heading}</h1>
-          {accel && <span className="badge">{accel === 'webgpu' ? 'WebGPU' : 'CPU'}</span>}
-        </header>
-
-        <nav className="tab-bar">
-          <button className={activeTab === 'chat' ? 'active' : ''} onClick={() => setActiveTab('chat')}>
-            💬 Chat
-          </button>
-        </nav>
-
-        <main className="tab-content">
-          {activeTab === 'chat' && <ChatTab />}
-        </main>
-      </div>
+    <div style={{ height: '100vh', overflow: 'auto' }}>
+      <ModelBanner
+        state={loader.state}
+        progress={loader.progress}
+        error={loader.error}
+        onLoad={loader.ensure}
+        label="LLM"
+      />
+      <header
+        style={{
+          padding: '16px 20px',
+          backgroundColor: 'white',
+          borderBottom: '1px solid #E5E7EB',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        <h1 style={{ margin: 0, fontSize: '20px' }}>Research Mode</h1>
+        <button
+          onClick={() => setMode(null)}
+          style={{
+            padding: '8px 16px',
+            backgroundColor: '#F3F4F6',
+            border: '1px solid #D1D5DB',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontSize: '14px',
+          }}
+        >
+          Change Mode
+        </button>
+      </header>
+      <ResearchMode />
     </div>
   );
 }
