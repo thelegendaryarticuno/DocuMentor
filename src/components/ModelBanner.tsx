@@ -27,7 +27,7 @@ export function ModelBanner({ state, progress, error, onLoad, label }: Props) {
           </div>
         </>
       )}
-      {state === 'loading' && <span>Loading {label} model into engine...</span>}
+      {state === 'loading' && <span>Warming up AI... Loading {label} model into engine.</span>}
       {state === 'error' && (
         <>
           <span className="error-text">Error: {error}</span>
