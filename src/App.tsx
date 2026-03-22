@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ModelCategory } from '@runanywhere/web';
 import { initSDK } from './runanywhere';
-import { DevMode } from './modes/DevMode';
 import { ResearchMode } from './modes/ResearchMode';
 import { ModelBanner } from './components/ModelBanner';
 import { useModelLoader } from './hooks/useModelLoader';
@@ -11,7 +10,7 @@ let appLevelModelEnsurePromise: Promise<boolean> | null = null;
 export function App() {
   const [sdkReady, setSdkReady] = useState(false);
   const [sdkError, setSdkError] = useState<string | null>(null);
-  const [mode, setMode] = useState<'dev' | 'research' | null>(null);
+  const [mode, setMode] = useState<'research' | null>(null);
   const loader = useModelLoader(ModelCategory.Language);
 
   useEffect(() => {
@@ -63,25 +62,10 @@ export function App() {
             Your documents. Your device. Your AI.
           </p>
           <p style={{ color: '#999', marginBottom: '40px' }}>
-            Choose a mode to analyze your documents with on-device AI. Zero backend. 100% private.
+            Analyze your documents with on-device AI. Zero backend. 100% private.
           </p>
 
           <div style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
-            <button
-              onClick={() => setMode('dev')}
-              style={{
-                padding: '20px 40px',
-                backgroundColor: '#2563EB',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '16px',
-                fontWeight: 600,
-                cursor: 'pointer',
-              }}
-            >
-              Dev Mode
-            </button>
             <button
               onClick={() => setMode('research')}
               style={{
@@ -99,62 +83,7 @@ export function App() {
             </button>
           </div>
 
-          <p style={{ marginTop: '40px', fontSize: '12px', color: '#999' }}>
-            <button
-              onClick={() => setMode(null)}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#2563EB',
-                cursor: 'pointer',
-                textDecoration: 'underline',
-                fontSize: '12px',
-              }}
-            >
-              Back
-            </button>
-          </p>
         </div>
-      </div>
-    );
-  }
-
-  if (mode === 'dev') {
-    return (
-      <div style={{ height: '100vh', overflow: 'auto' }}>
-        <ModelBanner
-          state={loader.state}
-          progress={loader.progress}
-          error={loader.error}
-          onLoad={loader.ensure}
-          label="LLM"
-        />
-        <header
-          style={{
-            padding: '16px 20px',
-            backgroundColor: 'white',
-            borderBottom: '1px solid #E5E7EB',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <h1 style={{ margin: 0, fontSize: '20px' }}>Dev Mode</h1>
-          <button
-            onClick={() => setMode(null)}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#F3F4F6',
-              border: '1px solid #D1D5DB',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '14px',
-            }}
-          >
-            Change Mode
-          </button>
-        </header>
-        <DevMode />
       </div>
     );
   }
