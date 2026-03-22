@@ -1,5 +1,5 @@
 # RunAnywhere Web Starter App
-//basic changes doesn't matter
+
 
 A minimal React + TypeScript starter app demonstrating **on-device AI in the browser** using the [`@runanywhere/web`](https://www.npmjs.com/package/@runanywhere/web) SDK. All inference runs locally via WebAssembly — no server, no API key, 100% private.
 
