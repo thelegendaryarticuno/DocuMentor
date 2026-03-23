@@ -4,6 +4,8 @@ import { ModelCategory } from '@runanywhere/web';
 import { initSDK } from './runanywhere';
 import { ResearchMode } from './modes/ResearchMode';
 import { StudentMode } from './modes/StudentMode';
+import { SmartHighlightsMode } from './modes/SmartHighlightsMode';
+import { HomePage } from './pages/HomePage';
 import { Home } from './pages/Home';
 import { useModelLoader } from './hooks/useModelLoader';
 
@@ -48,9 +50,11 @@ export function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
+      <Route path="/" element={<HomePage />} />
+      <Route path="/old-home" element={<Home />} />
       <Route path="/research" element={<ResearchMode />} />
       <Route path="/student" element={<StudentMode />} />
+      <Route path="/highlights" element={<SmartHighlightsMode />} />
     </Routes>
   );
 }
