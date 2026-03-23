@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { scanChunk } from '../lib/privacyScanner';
 import { ScannerFindings } from '../components/ScannerFindings';
 import { ChatPanel } from '../components/ChatPanel';
@@ -15,6 +16,7 @@ export const ResearchMode: React.FC<{ systemPrompt?: string; modelId?: string }>
   systemPrompt = RESEARCH_DEBATE_PROMPT,
   modelId = DEFAULT_MODEL_ID,
 }) => {
+  const navigate = useNavigate();
   const [thesis, setThesis] = useState('');
   const [thesisLoaded, setThesisLoaded] = useState(false);
   const [mode, setMode] = useState<'debate' | 'writing'>('debate');
@@ -221,89 +223,163 @@ export const ResearchMode: React.FC<{ systemPrompt?: string; modelId?: string }>
   // Empty state
   if (!thesisLoaded) {
     return (
-      <div style={{ padding: '40px', maxWidth: '800px', margin: '0 auto' }}>
-        <h2 style={{ marginBottom: '20px' }}>Research Mode — Thesis Debate & Writing</h2>
-
-        <div style={{ display: 'flex', gap: '20px', marginBottom: '20px' }}>
+      <div style={{ minHeight: '100vh', backgroundColor: '#F9FAFB' }}>
+        <div style={{ 
+          padding: '16px 24px', 
+          borderBottom: '1px solid #E5E7EB',
+          backgroundColor: 'white',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px'
+        }}>
+          <button
+            onClick={() => navigate('/')}
+            style={{
+              padding: '8px 12px',
+              backgroundColor: 'transparent',
+              border: 'none',
+              color: '#6B7280',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: 500,
+              transition: 'color 0.2s'
+            }}
+            onMouseOver={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.color = '#374151';
+            }}
+            onMouseOut={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.color = '#6B7280';
+            }}
+          >
+            ← Back
+          </button>
           <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
-              Paste your thesis section:
-            </label>
-            <textarea
-              value={thesis}
-              onChange={handlePasteThesis}
-              placeholder="Enter your thesis or argument here..."
-              style={{
-                width: '100%',
-                minHeight: '200px',
-                padding: '12px',
-                border: '1px solid #D1D5DB',
-                borderRadius: '6px',
-                fontFamily: 'inherit',
-                fontSize: '14px',
-                resize: 'vertical',
-              }}
-            />
-            <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
-              <button
-                onClick={handleLoadThesis}
-                disabled={!thesis.trim()}
-                style={{
-                  padding: '10px 20px',
-                  backgroundColor: thesis.trim() ? '#2563EB' : '#D1D5DB',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: thesis.trim() ? 'pointer' : 'default',
-                  fontSize: '14px',
-                  fontWeight: 500,
-                }}
-              >
-                Load Thesis
-              </button>
-              <label
-                style={{
-                  padding: '10px 20px',
-                  backgroundColor: '#F3F4F6',
-                  border: '1px solid #D1D5DB',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: 500,
-                }}
-              >
-                Upload .txt or .md
-                <input type="file" onChange={handleFileUpload} style={{ display: 'none' }} accept=".txt,.md" />
-              </label>
-            </div>
+            <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 600, color: '#111827' }}>
+              Research Mode
+            </h2>
+            <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#6B7280' }}>
+              Thesis Debate & Writing Assistant
+            </p>
           </div>
+        </div>
 
-          <div style={{ width: '300px', textAlign: 'center' }}>
-            <div
-              style={{
-                padding: '20px',
-                backgroundColor: '#F9FAFB',
-                borderRadius: '8px',
-                border: '1px dashed #D1D5DB',
-              }}
-            >
-              <p style={{ marginBottom: '12px', color: '#666' }}>Or try a demo:</p>
-              <button
-                onClick={handleLoadDemo}
+        <div style={{ padding: '40px 24px', maxWidth: '1000px', margin: '0 auto' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' }}>
+            <div>
+              <label style={{ display: 'block', marginBottom: '12px', fontWeight: 600, color: '#111827' }}>
+                📝 Paste your thesis section:
+              </label>
+              <textarea
+                value={thesis}
+                onChange={handlePasteThesis}
+                placeholder="Enter your thesis, argument, or essay section here..."
                 style={{
                   width: '100%',
-                  padding: '10px',
-                  backgroundColor: '#10B981',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
+                  minHeight: '240px',
+                  padding: '16px',
+                  border: '1px solid #D1D5DB',
+                  borderRadius: '8px',
+                  fontFamily: 'inherit',
                   fontSize: '14px',
-                  fontWeight: 500,
+                  resize: 'vertical',
+                  boxShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.05)',
+                }}
+              />
+              <div style={{ display: 'flex', gap: '10px', marginTop: '16px' }}>
+                <button
+                  onClick={handleLoadThesis}
+                  disabled={!thesis.trim()}
+                  style={{
+                    padding: '10px 24px',
+                    backgroundColor: thesis.trim() ? '#10B981' : '#D1D5DB',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: thesis.trim() ? 'pointer' : 'default',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseOver={(e) => {
+                    if (thesis.trim()) {
+                      (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#059669';
+                    }
+                  }}
+                  onMouseOut={(e) => {
+                    if (thesis.trim()) {
+                      (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#10B981';
+                    }
+                  }}
+                >
+                  Load Thesis
+                </button>
+                <label
+                  style={{
+                    padding: '10px 24px',
+                    backgroundColor: 'white',
+                    border: '1px solid #D1D5DB',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    color: '#374151',
+                    transition: 'all 0.2s',
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.backgroundColor = '#F3F4F6';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.backgroundColor = 'white';
+                  }}
+                >
+                  📤 Upload .txt or .md
+                  <input type="file" onChange={handleFileUpload} style={{ display: 'none' }} accept=".txt,.md" />
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <div
+                style={{
+                  padding: '32px',
+                  backgroundColor: 'white',
+                  borderRadius: '8px',
+                  border: '1px solid #E5E7EB',
+                  textAlign: 'center',
+                  height: 'fit-content',
                 }}
               >
-                Load Demo Thesis
-              </button>
+                <div style={{ fontSize: '40px', marginBottom: '16px' }}>🎯</div>
+                <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '8px', color: '#111827' }}>
+                  Try Demo Thesis
+                </h3>
+                <p style={{ fontSize: '13px', color: '#6B7280', marginBottom: '20px' }}>
+                  Load a sample thesis to see how debate and writing features work
+                </p>
+                <button
+                  onClick={handleLoadDemo}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    backgroundColor: '#3B82F6',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseOver={(e) => {
+                    (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#2563EB';
+                  }}
+                  onMouseOut={(e) => {
+                    (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#3B82F6';
+                  }}
+                >
+                  Load Demo
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -313,131 +389,181 @@ export const ResearchMode: React.FC<{ systemPrompt?: string; modelId?: string }>
 
   // Main research view
   return (
-    <div style={{ display: 'flex', height: 'calc(100vh - 100px)', backgroundColor: '#FAFAFA', color: '#111827' }}>
-      {/* Left: Thesis panel */}
-      <div
-        style={{
-          flex: '40%',
-          borderRight: '1px solid #E5E7EB',
-          overflow: 'auto',
-          padding: '20px',
-          backgroundColor: 'white',
-        }}
-      >
-        <div style={{ marginBottom: '12px' }}>
-          <label style={{ color: '#4B5563', fontSize: '12px' }}>YOUR THESIS</label>
-          <p style={{ fontSize: '12px', color: '#6B7280', marginTop: '4px' }}>
-            {thesis.split(/\s+/).length} words
-          </p>
-        </div>
-        <div
-          style={{
-            backgroundColor: '#F9FAFB',
-            padding: '16px',
-            borderRadius: '6px',
-            lineHeight: '1.6',
-            fontSize: '14px',
-            color: '#111827',
-            whiteSpace: 'pre-wrap',
-          }}
-        >
-          {thesis}
-        </div>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', backgroundColor: '#FAFAFA' }}>
+      {/* Header */}
+      <div style={{ 
+        backgroundColor: 'white',
+        borderBottom: '1px solid #E5E7EB',
+        padding: '12px 16px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px'
+      }}>
         <button
-          onClick={() => {
-            setThesisLoaded(false);
-            setThesis('');
-            debateChat.clearHistory();
-            writingChat.clearHistory();
-          }}
+          onClick={() => navigate('/')}
           style={{
-            marginTop: '12px',
-            width: '100%',
-            padding: '8px',
-            backgroundColor: '#F3F4F6',
-            border: '1px solid #D1D5DB',
-            borderRadius: '4px',
+            padding: '8px 12px',
+            backgroundColor: 'transparent',
+            border: 'none',
+            color: '#6B7280',
             cursor: 'pointer',
-            fontSize: '12px',
-            color: '#374151',
+            fontSize: '14px',
+            fontWeight: 500,
+            transition: 'color 0.2s'
+          }}
+          onMouseOver={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.color = '#374151';
+          }}
+          onMouseOut={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.color = '#6B7280';
           }}
         >
-          Edit / Replace
+          ← Home
         </button>
+        <h2 style={{ margin: 0, fontSize: '16px', fontWeight: 600, color: '#111827' }}>
+          Research Mode
+        </h2>
       </div>
 
-      {/* Right: Chat panel */}
-      <div style={{ flex: '60%', display: 'flex', flexDirection: 'column' }}>
-        {/* Mode tabs */}
-        <div style={{ display: 'flex', borderBottom: '1px solid #E5E7EB', backgroundColor: 'white' }}>
-          <button
-            onClick={() => handleModeSwitch('debate')}
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+        {/* Left: Thesis panel */}
+        <div
+          style={{
+            flex: '35%',
+            borderRight: '1px solid #E5E7EB',
+            overflow: 'auto',
+            padding: '20px',
+            backgroundColor: 'white',
+          }}
+        >
+          <div style={{ marginBottom: '12px' }}>
+            <label style={{ color: '#6B7280', fontSize: '12px', fontWeight: 600 }}>YOUR THESIS</label>
+            <p style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '4px' }}>
+              {thesis.split(/\s+/).length} words
+            </p>
+          </div>
+          <div
             style={{
-              flex: 1,
-              padding: '12px',
-              backgroundColor: mode === 'debate' ? 'white' : '#F9FAFB',
-              borderBottom: mode === 'debate' ? '2px solid #2563EB' : 'none',
-              color: mode === 'debate' ? '#2563EB' : '#666',
-              border: 'none',
-              cursor: 'pointer',
+              backgroundColor: '#F9FAFB',
+              padding: '16px',
+              borderRadius: '6px',
+              lineHeight: '1.6',
               fontSize: '14px',
-              fontWeight: mode === 'debate' ? 600 : 500,
+              color: '#111827',
+              whiteSpace: 'pre-wrap',
+              marginBottom: '16px',
+              minHeight: '200px',
+              maxHeight: 'calc(100vh - 300px)',
+              overflow: 'auto'
             }}
           >
-            💬 Debate
-          </button>
+            {thesis}
+          </div>
           <button
-            onClick={() => handleModeSwitch('writing')}
+            onClick={() => {
+              setThesisLoaded(false);
+              setThesis('');
+              debateChat.clearHistory();
+              writingChat.clearHistory();
+            }}
             style={{
-              flex: 1,
-              padding: '12px',
-              backgroundColor: mode === 'writing' ? 'white' : '#F9FAFB',
-              borderBottom: mode === 'writing' ? '2px solid #2563EB' : 'none',
-              color: mode === 'writing' ? '#2563EB' : '#666',
-              border: 'none',
+              width: '100%',
+              padding: '10px',
+              backgroundColor: '#F3F4F6',
+              border: '1px solid #D1D5DB',
+              borderRadius: '6px',
               cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: mode === 'writing' ? 600 : 500,
+              fontSize: '13px',
+              color: '#374151',
+              fontWeight: 500,
+              transition: 'all 0.2s'
+            }}
+            onMouseOver={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#E5E7EB';
+            }}
+            onMouseOut={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#F3F4F6';
             }}
           >
-            ✍ Writing Help
+            📝 Edit / Replace
           </button>
         </div>
 
-        {/* Chat */}
-        {acknowledged && (
-          <div style={{ flex: 1, overflow: 'hidden' }}>
-            {currentChat.error && (
-              <div
-                style={{
-                  margin: '12px',
-                  padding: '10px 12px',
-                  borderRadius: '6px',
-                  backgroundColor: '#FEF2F2',
-                  color: '#991B1B',
-                  border: '1px solid #FCA5A5',
-                  fontSize: '13px',
-                }}
-              >
-                {currentChat.error}
-              </div>
-            )}
-            <ChatPanel
-              key={mode}
-              messages={currentChat.messages}
-              onSend={(text) => { void currentChat.sendMessage(text, thesis); }}
-              isStreaming={currentChat.isStreaming}
-              isWarmingUp={currentChat.isWarmingUp}
-              onCancel={currentChat.cancelGeneration}
-              placeholder={
-                mode === 'debate'
-                  ? 'Continue the debate...'
-                  : 'Ask for help improving your writing...'
-              }
-              disabled={false}
-            />
+        {/* Right: Chat panel */}
+        <div style={{ flex: '65%', display: 'flex', flexDirection: 'column', backgroundColor: '#FAFAFA' }}>
+          {/* Mode tabs */}
+          <div style={{ display: 'flex', borderBottom: '1px solid #E5E7EB', backgroundColor: 'white' }}>
+            <button
+              onClick={() => handleModeSwitch('debate')}
+              style={{
+                flex: 1,
+                padding: '12px 16px',
+                backgroundColor: mode === 'debate' ? 'white' : '#F9FAFB',
+                borderBottom: mode === 'debate' ? '3px solid #10B981' : 'none',
+                color: mode === 'debate' ? '#10B981' : '#6B7280',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: mode === 'debate' ? 600 : 500,
+                transition: 'all 0.2s'
+              }}
+            >
+              💬 Debate
+            </button>
+            <button
+              onClick={() => handleModeSwitch('writing')}
+              style={{
+                flex: 1,
+                padding: '12px 16px',
+                backgroundColor: mode === 'writing' ? 'white' : '#F9FAFB',
+                borderBottom: mode === 'writing' ? '3px solid #10B981' : 'none',
+                color: mode === 'writing' ? '#10B981' : '#6B7280',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: mode === 'writing' ? 600 : 500,
+                transition: 'all 0.2s'
+              }}
+            >
+              ✍️ Writing Help
+            </button>
           </div>
-        )}
+
+          {/* Chat */}
+          {acknowledged && (
+            <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+              {currentChat.error && (
+                <div
+                  style={{
+                    margin: '12px',
+                    padding: '10px 12px',
+                    borderRadius: '6px',
+                    backgroundColor: '#FEF2F2',
+                    color: '#991B1B',
+                    border: '1px solid #FCA5A5',
+                    fontSize: '13px',
+                  }}
+                >
+                  {currentChat.error}
+                </div>
+              )}
+              <ChatPanel
+                key={mode}
+                messages={currentChat.messages}
+                onSend={(text) => { void currentChat.sendMessage(text, thesis); }}
+                isStreaming={currentChat.isStreaming}
+                isWarmingUp={currentChat.isWarmingUp}
+                onCancel={currentChat.cancelGeneration}
+                placeholder={
+                  mode === 'debate'
+                    ? 'Continue the debate...'
+                    : 'Ask for help improving your writing...'
+                }
+                disabled={false}
+              />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -158,6 +158,35 @@ body {
   overflow: hidden;
 }
 
+.guided-study-scroll,
+.guided-study-sidebar {
+  scrollbar-width: thin;
+  scrollbar-color: #94a3b8 rgba(255, 255, 255, 0.7);
+}
+
+.guided-study-scroll::-webkit-scrollbar,
+.guided-study-sidebar::-webkit-scrollbar {
+  width: 12px;
+}
+
+.guided-study-scroll::-webkit-scrollbar-track,
+.guided-study-sidebar::-webkit-scrollbar-track {
+  background: rgba(226, 232, 240, 0.9);
+  border-radius: 999px;
+}
+
+.guided-study-scroll::-webkit-scrollbar-thumb,
+.guided-study-sidebar::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #94a3b8, #64748b);
+  border-radius: 999px;
+  border: 2px solid rgba(226, 232, 240, 0.9);
+}
+
+.guided-study-scroll::-webkit-scrollbar-thumb:hover,
+.guided-study-sidebar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #64748b, #475569);
+}
+
 /* Mobile responsive */
 @media (max-width: 768px) {
   .app {
