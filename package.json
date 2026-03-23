@@ -16,7 +16,12 @@
     "@runanywhere/web": "^0.1.0-beta.10",
     "@runanywhere/web-llamacpp": "^0.1.0-beta.10",
     "@runanywhere/web-onnx": "^0.1.0-beta.10",
+    "file-saver": "^2.0.5",
+    "html-docx-js": "^0.3.1",
     "json5": "^2.2.3",
+    "jszip": "^3.10.1",
+    "mammoth": "^1.12.0",
+    "pdfjs-dist": "^5.5.207",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.13.1"
