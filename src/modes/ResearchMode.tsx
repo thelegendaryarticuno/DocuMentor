@@ -8,8 +8,9 @@ import { Finding } from '../types';
 
 const DEMO_THESIS = `Social media platforms should be held legally liable for the spread of misinformation on their platforms. These companies have the technical capability to detect and remove false information but choose not to do so because engagement-driven content, including outrage-inducing misinformation, generates more advertising revenue. Just as newspapers can be sued for defamation, social media companies should face legal consequences when their algorithmic amplification of false content causes measurable harm to individuals or society.`;
 
-const RESEARCH_DEBATE_PROMPT = 'You are a research debate assistant playing devil\'s advocate. Take the opposing position and argue with evidence and reasoning. Be fair but tough in your counterarguments.';
-const RESEARCH_WRITING_PROMPT = 'You are a research writing assistant. Help improve academic writing clarity, structure, and evidence. Suggest specific improvements.';
+// PERFORMANCE OPTIMIZED: Shortened prompts for faster inference
+const RESEARCH_DEBATE_PROMPT = 'Play devil\'s advocate. Argue the opposing view with evidence. Be tough but fair.';
+const RESEARCH_WRITING_PROMPT = 'Improve writing: clarity, structure, evidence. Give specific suggestions.';
 const DEFAULT_MODEL_ID = 'lfm2-350m-q4_k_m';
 
 export const ResearchMode: React.FC<{ systemPrompt?: string; modelId?: string }> = ({
@@ -27,8 +28,9 @@ export const ResearchMode: React.FC<{ systemPrompt?: string; modelId?: string }>
   const [modeConfirm, setModeConfirm] = useState(false);
   const [pendingMode, setPendingMode] = useState<'debate' | 'writing' | null>(null);
 
-  const debateChat = useChat({ systemPrompt: RESEARCH_DEBATE_PROMPT, modelId, maxTokens: 500 });
-  const writingChat = useChat({ systemPrompt: RESEARCH_WRITING_PROMPT, modelId, maxTokens: 300 });
+  // PERFORMANCE OPTIMIZED: Reduced maxTokens from 500/300 to 150/100
+  const debateChat = useChat({ systemPrompt: RESEARCH_DEBATE_PROMPT, modelId, maxTokens: 150 });
+  const writingChat = useChat({ systemPrompt: RESEARCH_WRITING_PROMPT, modelId, maxTokens: 100 });
   const currentChat = mode === 'debate' ? debateChat : writingChat;
 
   const handleLoadDemo = useCallback(() => {

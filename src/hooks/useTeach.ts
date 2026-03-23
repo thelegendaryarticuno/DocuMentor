@@ -300,52 +300,33 @@ export function useTeach(): UseTeachResult {
       setTeaching(true);
 
       try {
+        // PERFORMANCE OPTIMIZED: Drastically simplified system prompt (10x shorter)
         const systemPrompt =
           `${StructuredOutput.getSystemPrompt(lessonSchema)}\n\n` +
-          'You are DocuMentor, an on-device teaching engine for confusing documents.\n' +
-          'Return ONLY valid JSON. No markdown. No code fences. No prose outside JSON.\n\n' +
-          'Goals:\n' +
-          '- Teach the topic fast and accurately.\n' +
-          '- Use plain language for a learner who feels stuck.\n' +
-          '- Keep every field concise and high-signal.\n' +
-          '- Prefer practical intuition over textbook wording.\n' +
-          '- title must name the real task or topic from the source, not a vague label. Good: "Arch Linux Installation Guide". Bad: "This document" or "Untitled concept".\n' +
-          '- If code appears in the source, explain it in a coding context.\n' +
-          '- Always include one small clickable game via mini_game, but make it source-grounded.\n' +
-          '- If the source includes terminal commands, shell snippets, or procedural install steps, include command_lab with 1-3 exact commands copied from the source and token_hints explaining what each important token does.\n' +
-          '- command_lab.steps[].command must contain only the shell command itself. Never include explanation sentences, paragraphs, or surrounding prose inside the command field.\n' +
-          '- For command-focused docs, explain what the learner is being asked to type before asking them to type it.\n' +
-          '- For command/process docs, prefer sequencing, command recognition, or terminal practice over generic trivia.\n' +
-          '- card_format rules:\n' +
-          '  - stepper: use for processes, flows, lifecycles, pipelines.\n' +
-          '  - analogy: use for abstract ideas that need intuition.\n' +
-          '  - compare: use when the topic contrasts two approaches.\n' +
-          '  - quiz: use when the source is definition-heavy or needs active recall.\n' +
-          '- lesson.card_format must exactly match classify.card_format.\n' +
-          '- complexity should reflect the source and default to beginner when unsure.\n' +
-          '- key_takeaways should be memorable and short.\n' +
-          '- common_traps should describe mistakes learners commonly make.\n' +
-          '- next_try should be a single next question or experiment the learner should try.\n' +
-          '- source_snippets must contain 2-3 exact short phrases copied verbatim from the source text.\n' +
-          '- Do not invent APIs, tags, functions, variable names, or examples not present in the source unless clearly labeled as an analogy.\n' +
-          '- If the source is HTML/CSS/JS/code, stay anchored to those exact tags, attributes, functions, or lines.\n' +
-          '- For stepper include steps.\n' +
-          '- For analogy include real_world and code_equivalent.\n' +
-          '- For compare include option_a and option_b.\n' +
-          '- For quiz include quiz with explanations.\n';
+          'DocuMentor: Return ONLY valid JSON.\n' +
+          'Rules:\n' +
+          '- Teach fast, use plain language\n' +
+          '- title: name the real topic\n' +
+          '- card_format: stepper (process), analogy (abstract), compare (contrast), quiz (definitions)\n' +
+          '- Include mini_game for practice\n' +
+          '- For code/commands: include command_lab\n' +
+          '- Keep all fields concise\n' +
+          '- source_snippets: 2-3 exact phrases from source';
 
-        const prompt =
-          'Teach the following source as an interactive mini-lesson:\n\n' +
-          chunk;
+        // PERFORMANCE OPTIMIZED: Reduced chunk size from unlimited to 400 words max
+        const trimmedChunk = chunk.split(' ').slice(0, 400).join(' ');
+        const prompt = 'Teach this:\n\n' + trimmedChunk;
 
         let normalized: TeachEnvelope | null = null;
 
         try {
+          // PERFORMANCE OPTIMIZED: Reduced maxTokens from 700 to 400, faster temp
           const result = await TextGeneration.generate(prompt, {
             systemPrompt,
-            maxTokens: 700,
-            temperature: 0.15,
-            topP: 0.9,
+            maxTokens: 400, // Reduced from 700
+            temperature: 0.1, // Lower = faster + more deterministic
+            topP: 0.85,
+            topK: 30,
           });
 
           setStage('teaching');
