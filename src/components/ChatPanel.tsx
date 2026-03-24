@@ -8,6 +8,7 @@ interface ChatPanelProps {
   isWarmingUp?: boolean;
   onCancel: () => void;
   placeholder?: string;
+  emptyStateText?: string;
   disabled?: boolean;
   disabledReason?: string;
 }
@@ -19,6 +20,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
   isWarmingUp = false,
   onCancel,
   placeholder = 'Ask anything about your document...',
+  emptyStateText = 'Upload a document and ask anything...',
   disabled = false,
   disabledReason,
 }) => {
@@ -76,7 +78,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
       <div className="chat-messages" style={{ flex: 1, overflow: 'auto', padding: '16px' }}>
         {messages.length === 0 && (
           <div style={{ textAlign: 'center', color: '#999', marginTop: '40px' }}>
-            <p>Upload a document and ask anything...</p>
+            <p>{emptyStateText}</p>
           </div>
         )}
         {messages.map((msg, i) => {

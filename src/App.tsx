@@ -7,6 +7,7 @@ import { StudentMode } from './modes/StudentMode';
 import { SmartHighlightsMode } from './modes/SmartHighlightsMode';
 import { HomePage } from './pages/HomePage';
 import { Home } from './pages/Home';
+import { ChatbotPage } from './pages/ChatbotPage';
 import { useModelLoader } from './hooks/useModelLoader';
 
 let appLevelModelEnsurePromise: Promise<boolean> | null = null;
@@ -51,6 +52,7 @@ export function App() {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
+      <Route path="/chatbot" element={<ChatbotPage />} />
       <Route path="/old-home" element={<Home />} />
       <Route path="/research" element={<ResearchMode />} />
       <Route path="/student" element={<StudentMode />} />
