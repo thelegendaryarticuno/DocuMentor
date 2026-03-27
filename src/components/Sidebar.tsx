@@ -11,7 +11,6 @@ export function Sidebar({ currentPath, onNavigate }: SidebarProps) {
   const routes = [
     { path: '/', icon: '🏠', label: 'Home' },
     { path: '/research', icon: '🔬', label: 'Research' },
-    { path: '/dev', icon: '⚙️', label: 'Dev' },
   ];
 
   const handleNavigate = (path: string) => {

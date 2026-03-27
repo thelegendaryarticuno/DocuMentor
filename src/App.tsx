@@ -1,22 +1,21 @@
 import { useState, useEffect } from 'react';
-import { initSDK, getAccelerationMode } from './runanywhere';
-import { ChatTab } from './components/ChatTab';
-import { Sidebar } from './components/Sidebar';
+import { Routes, Route } from 'react-router-dom';
+import { ModelCategory } from '@runanywhere/web';
+import { initSDK } from './runanywhere';
+import { ResearchMode } from './modes/ResearchMode';
+import { StudentMode } from './modes/StudentMode';
+import { SmartHighlightsMode } from './modes/SmartHighlightsMode';
+import { HomePage } from './pages/HomePage';
+import { Home } from './pages/Home';
+import { ChatbotPage } from './pages/ChatbotPage';
+import { useModelLoader } from './hooks/useModelLoader';
 
-type Tab = 'chat';
-
-function getPageHeading(pathname: string): string {
-  if (pathname === '/research') return 'research heading chatbot';
-  if (pathname === '/dev') return 'dev mode chatbot heading';
-  return 'home page chatbot';
-}
+let appLevelModelEnsurePromise: Promise<boolean> | null = null;
 
 export function App() {
   const [sdkReady, setSdkReady] = useState(false);
   const [sdkError, setSdkError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<Tab>('chat');
-  const [currentPath, setCurrentPath] = useState(window.location.pathname);
-  const [heading, setHeading] = useState(getPageHeading(window.location.pathname));
+  const loader = useModelLoader(ModelCategory.Language);
 
   useEffect(() => {
     initSDK()
@@ -25,20 +24,11 @@ export function App() {
   }, []);
 
   useEffect(() => {
-    const updateHeading = () => {
-      const newPath = window.location.pathname;
-      setCurrentPath(newPath);
-      setHeading(getPageHeading(newPath));
-    };
-    window.addEventListener('popstate', updateHeading);
-    return () => window.removeEventListener('popstate', updateHeading);
-  }, []);
-
-  const handleNavigate = (path: string) => {
-    window.history.pushState(null, '', path);
-    setCurrentPath(path);
-    setHeading(getPageHeading(path));
-  };
+    if (sdkReady) {
+      // Start model loading once at app startup so mode switches do not re-trigger downloads.
+      appLevelModelEnsurePromise ??= loader.ensure();
+    }
+  }, [loader.ensure, sdkReady]);
 
   if (sdkError) {
     return (
@@ -59,27 +49,14 @@ export function App() {
     );
   }
 
-  const accel = getAccelerationMode();
-
   return (
-    <div className="app">
-      <Sidebar currentPath={currentPath} onNavigate={handleNavigate} />
-      <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-        <header className="app-header">
-          <h1>{heading}</h1>
-          {accel && <span className="badge">{accel === 'webgpu' ? 'WebGPU' : 'CPU'}</span>}
-        </header>
-
-        <nav className="tab-bar">
-          <button className={activeTab === 'chat' ? 'active' : ''} onClick={() => setActiveTab('chat')}>
-            💬 Chat
-          </button>
-        </nav>
-
-        <main className="tab-content">
-          {activeTab === 'chat' && <ChatTab />}
-        </main>
-      </div>
-    </div>
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/chatbot" element={<ChatbotPage />} />
+      <Route path="/old-home" element={<Home />} />
+      <Route path="/research" element={<ResearchMode />} />
+      <Route path="/student" element={<StudentMode />} />
+      <Route path="/highlights" element={<SmartHighlightsMode />} />
+    </Routes>
   );
 }

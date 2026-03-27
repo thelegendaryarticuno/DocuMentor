@@ -1,4 +1,5 @@
-# DocuMentor
+# RunAnywhere Web Starter App
+
 
 DocuMentor is an offline, privacy-first document assistant that runs entirely in your browser.
 
