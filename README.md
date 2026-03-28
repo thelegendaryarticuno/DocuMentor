@@ -1,131 +1,120 @@
-# RunAnywhere Web Starter App
+# DocuMentor
 
+DocuMentor is an offline, privacy-first document assistant that runs entirely in your browser.
 
-A minimal React + TypeScript starter app demonstrating **on-device AI in the browser** using the [`@runanywhere/web`](https://www.npmjs.com/package/@runanywhere/web) SDK. All inference runs locally via WebAssembly — no server, no API key, 100% private.
+Designed for real-world sensitive reading and writing workflows (insurance documents, policies, contracts, academic drafts, internal technical docs), all AI processing in DocuMentor occurs entirely on-device (via WebAssembly and WebGPU) — no server-side inference, no API keys, and no telemetry.
 
-## Features
+## 🚀 Key Features
 
-| Tab | What it does |
-|-----|-------------|
-| **Chat** | Stream text from an on-device LLM (LFM2 350M) |
-| **Vision** | Point your camera and describe what the VLM sees (LFM2-VL 450M) |
-| **Voice** | Speak naturally — VAD detects speech, STT transcribes, LLM responds, TTS speaks back |
+DocuMentor focuses on three core experiences:
 
-## Quick Start
+### 1. Smart Highlights 
+*Surface the most important sections in long files.*
+- Upload PDF or DOCX files and instantly extract top-priority text.
+- Triggers deep document chunking and local AI analysis to assign `Importance Level` flags (Low, Medium, Critical) with robust reasoning.
+- Export your highlights into a structured format for external review.
+
+### 2. Guided Learning (Student Mode)
+*Learn directly from your own notes, docs, and code.*
+- Feed the AI unstructured text, and it transforms it into an interactive lesson.
+- Generates step-by-step structures like analogies, quizzes, and bulleted takeaways rendered in dedicated "Teach Cards."
+- Maintains session-aware local memory of your sources to continually ground the lesson in your materials.
+
+### 3. Research Mode
+*Challenge arguments and refine your writing seamlessly.*
+- Includes two sub-modes spanning a persistent chat workflow.
+- **Debate Mode:** Acts as a devil's advocate to your arguments by identifying logical gaps and offering counter-points.
+- **Writing Mode:** Transitions from critique to feedback, offering tangible structural and clarity improvements for your academic or technical drafts.
+
+### 🛡️ Pre-computation Privacy Scanner
+Before any document is passed to the AI runtimes, DocuMentor runs an aggressive local regex scan to catch leaked secrets:
+- **Critical Secrets:** AWS keys, Stripe secrets, Private Keys, GitHub endpoints.
+- **High Sensitivity:** JWTs, Database URIs, exposed `.env` variables.
+- **Medium/Low Sensitivity:** Emails, Phone Numbers, IP Addresses.
+- **Actionable UI:** Users are stopped by a modal UI requiring explicit acknowledgment or remediation of found secrets before analysis continues.
+
+## 💻 Tech Stack
+
+| Layer | Technology | Purpose |
+|---|---|---|
+| **Frontend Framework** | React 19 + TypeScript | UI composition and state management |
+| **Routing** | React Router DOM v7 | Client-side page and mode navigation |
+| **Build Tool** | Vite 6 | Fast dev server, bundling, worker abstractions |
+| **Document Parsing** | `pdfjs-dist`, `mammoth`, `html-docx-js` | In-browser file interpretation (PDF / Word) |
+| **AI Core** | `@runanywhere/web` | Local SDK init, model registry, model state management |
+| **Local LLM Backend** | `@runanywhere/web-llamacpp` | Inference via WebAssembly/WebGPU (Text/Vision worker bridge) |
+| **Local Audio Backend**| `@runanywhere/web-onnx` | ONNX runtime backend registration (STT/TTS capabilities) |
+| **Deployment** | Vercel | SPA hosting configured with Cross-Origin Isolation headers required for SharedArrayBuffer |
+
+## 🌟 RunAnywhere AI Integration
+The AI orchestration uses the `@runanywhere` suite to keep workloads on the client.
+- **Worker Architecture:** AI inference runs inside a Web Worker thread (`src/workers/vlm-worker.ts`), preventing UI stutter during heavy token generation.
+- **Model Caching:** Models are downloaded directly from HuggingFace to the browser's Origin Private File System (OPFS).
+- **Graceful Loading:** A robust UI layer (via `ModelBanner`) monitors loading progress, from fetching bytes to transferring GPU buffers, enabling a smooth user experience even on a cold start.
+
+## 🛠️ Quick Start
 
 ```bash
+# Install dependencies
 npm install
+
+# Start local Vite development server
 npm run dev
+
+# Start dev server explicitly requesting your local GPU (Chrome vs Edge vs Brave)
+# These use concurrently and a wait-on script to open with hardware flags
+npm run dev:gpu
+npm run dev:chrome
 ```
 
-Open [http://localhost:5173](http://localhost:5173). Models are downloaded on first use and cached in the browser's Origin Private File System (OPFS).
+Open `http://localhost:5173`.
 
-## How It Works
-
-```
-@runanywhere/web (npm package)
-  ├── WASM engine (llama.cpp, whisper.cpp, sherpa-onnx)
-  ├── Model management (download, OPFS cache, load/unload)
-  └── TypeScript API (TextGeneration, STT, TTS, VAD, VLM, VoicePipeline)
-```
-
-The app imports everything from `@runanywhere/web`:
-
-```typescript
-import { RunAnywhere, SDKEnvironment } from '@runanywhere/web';
-import { TextGeneration, VLMWorkerBridge } from '@runanywhere/web-llamacpp';
-
-await RunAnywhere.initialize({ environment: SDKEnvironment.Development });
-
-// Stream LLM text
-const { stream } = await TextGeneration.generateStream('Hello!', { maxTokens: 200 });
-for await (const token of stream) { console.log(token); }
-
-// VLM: describe an image
-const result = await VLMWorkerBridge.shared.process(rgbPixels, width, height, 'Describe this.');
-```
-
-## Project Structure
-
-```
-src/
-├── main.tsx              # React root
-├── App.tsx               # Tab navigation (Chat | Vision | Voice)
-├── runanywhere.ts        # SDK init + model catalog + VLM worker
-├── workers/
-│   └── vlm-worker.ts     # VLM Web Worker entry (2 lines)
-├── hooks/
-│   └── useModelLoader.ts # Shared model download/load hook
-├── components/
-│   ├── ChatTab.tsx        # LLM streaming chat
-│   ├── VisionTab.tsx      # Camera + VLM inference
-│   ├── VoiceTab.tsx       # Full voice pipeline
-│   └── ModelBanner.tsx    # Download progress UI
-└── styles/
-    └── index.css          # Dark theme CSS
-```
-
-## Adding Your Own Models
-
-Edit the `MODELS` array in `src/runanywhere.ts`:
-
-```typescript
-{
-  id: 'my-custom-model',
-  name: 'My Model',
-  repo: 'username/repo-name',           // HuggingFace repo
-  files: ['model.Q4_K_M.gguf'],         // Files to download
-  framework: LLMFramework.LlamaCpp,
-  modality: ModelCategory.Language,      // or Multimodal, SpeechRecognition, etc.
-  memoryRequirement: 500_000_000,        // Bytes
-}
-```
-
-Any GGUF model compatible with llama.cpp works for LLM/VLM. STT/TTS/VAD use sherpa-onnx models.
-
-## Deployment
-
-### Vercel
+For a production build (which injects the necessary WebAssembly assets):
 
 ```bash
 npm run build
-npx vercel --prod
+npm run preview
 ```
 
-The included `vercel.json` sets the required Cross-Origin-Isolation headers.
+## 📂 Source Walkthrough
 
-### Netlify
-
-Add a `_headers` file:
-
+```text
+src/
+├── main.tsx                  # React entry point, mounts router
+├── App.tsx                   # Routes mappings and RunAnywhere SDK Initialization
+├── index.css                 # Core design system and responsive chat variables
+├── components/               # Core UI Building Blocks
+│   ├── ChatPanel.tsx         # Chat interface 
+│   ├── ChatTab.tsx           # Real-time message token streaming logic
+│   ├── ModelBanner.tsx       # AI Model loader UX state machine
+│   ├── ScannerFindings.tsx   # Modal for privacy leaks
+│   ├── Sidebar.tsx           # Route navigation menu
+│   └── TeachCard.tsx         # Dedicated view for Student Mode parsing
+├── hooks/                    # Business Logic hooks 
+│   ├── useChat.ts            # Chat interactions
+│   ├── useHighlightAnalysis.ts # Chunking and AI processing for documents
+│   ├── useModelLoader.ts     # Loading abstractions via Origin Private File System
+│   └── useTeach.ts           # Interfacing local model with structured JSON parsing
+├── lib/                      # Pure Logic & Types
+│   ├── documentParser.ts     # Extracting text from files via robust parsing libraries
+│   └── privacyScanner.ts     # Regex patterns for secret detection
+├── modes/                    # High-Level Feature Modules
+│   ├── ResearchMode.tsx      
+│   ├── SmartHighlightsMode.tsx
+│   └── StudentMode.tsx
+└── workers/
+    └── vlm-worker.ts         # Off-main-thread Web Worker for model inference
 ```
-/*
-  Cross-Origin-Opener-Policy: same-origin
-  Cross-Origin-Embedder-Policy: credentialless
-```
 
-### Any static host
+## ☁️ Deployment Requirements
 
-Serve the `dist/` folder with these HTTP headers on all responses:
-
-```
+This application relies heavily on `SharedArrayBuffer` for multi-threaded WASM and WebGPU speed.
+For production deployments, ensure the host (e.g. Vercel) includes these headers:
+```text
 Cross-Origin-Opener-Policy: same-origin
 Cross-Origin-Embedder-Policy: credentialless
 ```
-
-## Browser Requirements
-
-- Chrome 96+ or Edge 96+ (recommended: 120+)
-- WebAssembly (required)
-- SharedArrayBuffer (requires Cross-Origin Isolation headers)
-- OPFS (for persistent model cache)
-
-## Documentation
-
-- [SDK API Reference](https://docs.runanywhere.ai)
-- [npm package](https://www.npmjs.com/package/@runanywhere/web)
-- [GitHub](https://github.com/RunanywhereAI/runanywhere-sdks)
+*(DocuMentor achieves this out-of-the-box via `vercel.json`).*
 
 ## License
-
 MIT
