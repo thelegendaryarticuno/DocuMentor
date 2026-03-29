@@ -116,5 +116,3 @@ Cross-Origin-Embedder-Policy: credentialless
 ```
 *(DocuMentor achieves this out-of-the-box via `vercel.json`).*
 
-## License
-MIT
