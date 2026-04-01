@@ -15,16 +15,13 @@ export function Home() {
     if (!appLevelModelEnsurePromise) {
       appLevelModelEnsurePromise = loader.ensure();
     }
-  }, [loader]);
+  }, [loader.ensure]);
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#FFFFFF' }}>
       <ModelBanner
-        state={loader.state}
-        progress={loader.progress}
-        error={loader.error}
-        onLoad={loader.ensure}
-        label="LLM"
+        progress={loader.progress * 100}
+        modelName="LLM"
       />
       
       <div style={{ 

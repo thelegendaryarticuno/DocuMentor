@@ -92,11 +92,8 @@ export function ChatTab() {
   return (
     <div className="tab-panel chat-panel">
       <ModelBanner
-        state={loader.state}
-        progress={loader.progress}
-        error={loader.error}
-        onLoad={loader.ensure}
-        label="LLM"
+        progress={loader.progress * 100}
+        modelName="LLM"
       />
 
       <div className="message-list" ref={listRef}>
