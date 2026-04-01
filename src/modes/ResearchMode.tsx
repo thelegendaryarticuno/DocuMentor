@@ -163,16 +163,15 @@ export const ResearchMode: React.FC<{ systemPrompt?: string; modelId?: string }>
       >
         <div
           style={{
-            backgroundColor: 'white',
-            borderRadius: '8px',
+            backgroundColor: 'var(--bg-surface)',
+            borderRadius: 'var(--rl)',
             padding: '24px',
             maxWidth: '400px',
             textAlign: 'center',
-            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
           }}
         >
-          <h3 style={{ marginBottom: '16px' }}>Switch Modes?</h3>
-          <p style={{ marginBottom: '20px', color: '#666' }}>
+          <h3 style={{ marginBottom: '16px', color: 'var(--text-primary)', fontFamily: 'var(--font-display)', fontWeight: 700 }}>Switch Modes?</h3>
+          <p style={{ marginBottom: '20px', color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}>
             This will start a new conversation and reset the current chat history.
           </p>
           <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
@@ -180,11 +179,13 @@ export const ResearchMode: React.FC<{ systemPrompt?: string; modelId?: string }>
               onClick={() => setModeConfirm(false)}
               style={{
                 padding: '10px 20px',
-                border: '1px solid #D1D5DB',
-                backgroundColor: 'white',
-                borderRadius: '6px',
+                border: '1px solid var(--border-subtle)',
+                backgroundColor: 'var(--bg-surface)',
+                borderRadius: 'var(--r)',
                 cursor: 'pointer',
                 fontSize: '14px',
+                color: 'var(--text-primary)',
+                fontFamily: 'var(--font-body)',
               }}
             >
               Cancel
@@ -193,13 +194,14 @@ export const ResearchMode: React.FC<{ systemPrompt?: string; modelId?: string }>
               onClick={confirmModeSwitch}
               style={{
                 padding: '10px 20px',
-                backgroundColor: '#2563EB',
+                backgroundColor: 'var(--accent)',
                 color: 'white',
                 border: 'none',
-                borderRadius: '6px',
+                borderRadius: 'var(--r)',
                 cursor: 'pointer',
                 fontSize: '14px',
                 fontWeight: 500,
+                fontFamily: 'var(--font-display)',
               }}
             >
               Continue
@@ -225,7 +227,7 @@ export const ResearchMode: React.FC<{ systemPrompt?: string; modelId?: string }>
   // Empty state
   if (!thesisLoaded) {
     return (
-      <div style={{ minHeight: '100vh', backgroundColor: '#F9FAFB' }}>
+      <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg-page)' }}>
         <div style={{ 
           padding: '16px 24px', 
           borderBottom: '1px solid #E5E7EB',
@@ -293,23 +295,24 @@ export const ResearchMode: React.FC<{ systemPrompt?: string; modelId?: string }>
                   disabled={!thesis.trim()}
                   style={{
                     padding: '10px 24px',
-                    backgroundColor: thesis.trim() ? '#10B981' : '#D1D5DB',
+                    backgroundColor: thesis.trim() ? 'var(--accent)' : 'var(--border-subtle)',
                     color: 'white',
                     border: 'none',
-                    borderRadius: '6px',
+                    borderRadius: 'var(--r)',
                     cursor: thesis.trim() ? 'pointer' : 'default',
                     fontSize: '14px',
                     fontWeight: 600,
-                    transition: 'all 0.2s'
+                    transition: 'all 0.2s',
+                    fontFamily: 'var(--font-body)',
                   }}
                   onMouseOver={(e) => {
                     if (thesis.trim()) {
-                      (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#059669';
+                      (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--accent-dark)';
                     }
                   }}
                   onMouseOut={(e) => {
                     if (thesis.trim()) {
-                      (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#10B981';
+                      (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--accent)';
                     }
                   }}
                 >
@@ -318,20 +321,21 @@ export const ResearchMode: React.FC<{ systemPrompt?: string; modelId?: string }>
                 <label
                   style={{
                     padding: '10px 24px',
-                    backgroundColor: 'white',
-                    border: '1px solid #D1D5DB',
-                    borderRadius: '6px',
+                    backgroundColor: 'var(--bg-surface)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: 'var(--r)',
                     cursor: 'pointer',
                     fontSize: '14px',
                     fontWeight: 600,
-                    color: '#374151',
+                    color: 'var(--text-primary)',
                     transition: 'all 0.2s',
+                    fontFamily: 'var(--font-body)',
                   }}
                   onMouseOver={(e) => {
-                    e.currentTarget.style.backgroundColor = '#F3F4F6';
+                    e.currentTarget.style.backgroundColor = 'var(--bg-raised)';
                   }}
                   onMouseOut={(e) => {
-                    e.currentTarget.style.backgroundColor = 'white';
+                    e.currentTarget.style.backgroundColor = 'var(--bg-surface)';
                   }}
                 >
                   📤 Upload .txt or .md
@@ -355,7 +359,7 @@ export const ResearchMode: React.FC<{ systemPrompt?: string; modelId?: string }>
                 <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '8px', color: '#111827' }}>
                   Try Demo Thesis
                 </h3>
-                <p style={{ fontSize: '13px', color: '#6B7280', marginBottom: '20px' }}>
+                <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '20px' }}>
                   Load a sample thesis to see how debate and writing features work
                 </p>
                 <button
@@ -363,20 +367,21 @@ export const ResearchMode: React.FC<{ systemPrompt?: string; modelId?: string }>
                   style={{
                     width: '100%',
                     padding: '12px',
-                    backgroundColor: '#3B82F6',
+                    backgroundColor: 'var(--accent)',
                     color: 'white',
                     border: 'none',
-                    borderRadius: '6px',
+                    borderRadius: 'var(--r)',
                     cursor: 'pointer',
                     fontSize: '14px',
                     fontWeight: 600,
-                    transition: 'all 0.2s'
+                    transition: 'all 0.2s',
+                    fontFamily: 'var(--font-display)',
                   }}
                   onMouseOver={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#2563EB';
+                    (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--accent-dark)';
                   }}
                   onMouseOut={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#3B82F6';
+                    (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--accent)';
                   }}
                 >
                   Load Demo
@@ -391,7 +396,7 @@ export const ResearchMode: React.FC<{ systemPrompt?: string; modelId?: string }>
 
   // Main research view
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', backgroundColor: '#FAFAFA' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', backgroundColor: 'var(--bg-page)' }}>
       {/* Header */}
       <div style={{ 
         backgroundColor: 'white',
