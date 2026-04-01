@@ -1,0 +1,33 @@
+DATA HANDLING AND SECURITY POLICY
+Version: 1.0
+Effective Date: April 1, 2026
+Owner: Information Security Office
+
+1. PURPOSE
+This policy defines controls for information classification, access management, incident response, and audit readiness across all teams.
+
+2. SCOPE
+This policy applies to all employees, contractors, temporary staff, and third-party vendors with access to company systems or data.
+
+3. LOW PRIORITY GUIDANCE
+Low: Teams should keep project folders organized using standard naming conventions to improve document discovery.
+Low: Teams should archive non-operational meeting notes every quarter unless legal hold requirements apply.
+Low: Teams may use template checklists for routine onboarding tasks to improve consistency.
+
+4. MEDIUM PRIORITY REQUIREMENTS
+Medium: Department managers should review access logs weekly and record unresolved anomalies in the compliance tracker.
+Medium: Project owners should verify vendor risk questionnaires are current before contract renewal.
+Medium: Team leads should confirm backup restoration tests are performed at least once per quarter.
+
+5. HIGH PRIORITY CONTROLS
+High: Production credentials must never be shared in chat, email, or ticket comments.
+High: Any suspected unauthorized access must be reported to Security Operations within 1 hour.
+High: Systems processing customer data must enforce multi-factor authentication and immediate credential rotation after incidents.
+
+6. ENFORCEMENT
+Failure to follow this policy may result in disciplinary action, temporary access suspension, mandatory retraining, and formal incident review.
+
+7. APPROVAL
+Approved by: Chief Information Security Officer
+Approval Date: April 1, 2026
+Next Review Date: April 1, 2027

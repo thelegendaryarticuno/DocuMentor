@@ -54,14 +54,17 @@ export function useHighlightAnalysis(): UseHighlightAnalysisReturn {
       // Step 3: Use AI for uncertain cases with improved prompt
       try {
         const truncated = chunk.slice(0, 500); // Shorter for speed
-        const prompt = `Text: "${truncated}"
+        const prompt = `Classify the importance of the text below.
 
-Rate as ONE WORD ONLY:
-- critical (warnings, errors, requirements, "must", "do not")
-- medium (tips, recommendations, "should", "important")  
-- low (descriptions, background, general info)
+      Text:
+      """
+      ${truncated}
+      """
 
-Rating:`;
+      Reply with exactly one token (no punctuation, no explanation):
+      critical
+      medium
+      low`;
 
         const result = await TextGeneration.generate(prompt, {
           maxTokens: 10, // Very short - just one word
@@ -71,31 +74,8 @@ Rating:`;
         });
 
         const response = result.text.toLowerCase().trim();
-        
-        // Parse AI response
-        let importance: ImportanceLevel = 'low';
-        let reason = 'General content';
-
-        if (response.includes('critical')) {
-          importance = 'critical';
-          reason = 'AI: Contains critical information';
-        } else if (response.includes('medium')) {
-          importance = 'medium';
-          reason = 'AI: Contains relevant information';
-        }
-        
-        // Combine AI with heuristics (weighted average)
-        // If they disagree, trust heuristics more
-        if (heuristicResult.confidence >= 0.5) {
-          // Weight: 60% heuristic, 40% AI
-          if (heuristicResult.importance === 'critical' && importance !== 'critical') {
-            importance = 'medium'; // Compromise
-            reason = 'Mixed signals - marked as important';
-          } else if (heuristicResult.importance === 'low' && importance === 'critical') {
-            importance = 'medium'; // Compromise
-            reason = 'Conflicting analysis - marked as important';
-          }
-        }
+        const aiImportance = parseAIImportance(response);
+        const { importance, reason } = combineImportance(heuristicResult, aiImportance);
 
         return {
           text: chunk,
@@ -170,6 +150,61 @@ Rating:`;
     progress,
     isAnalyzing,
     error,
+  };
+}
+
+function parseAIImportance(response: string): ImportanceLevel | null {
+  const firstToken = response
+    .replace(/[^a-z\s]/g, ' ')
+    .trim()
+    .split(/\s+/)[0];
+
+  if (firstToken === 'critical' || firstToken === 'medium' || firstToken === 'low') {
+    return firstToken;
+  }
+
+  // Fallback: use standalone words only (avoids accidental substring matches)
+  if (/\bcritical\b/.test(response)) return 'critical';
+  if (/\bmedium\b/.test(response)) return 'medium';
+  if (/\blow\b/.test(response)) return 'low';
+
+  return null;
+}
+
+function combineImportance(
+  heuristicResult: { importance: ImportanceLevel; confidence: number },
+  aiImportance: ImportanceLevel | null
+): { importance: ImportanceLevel; reason: string } {
+  if (!aiImportance) {
+    return {
+      importance: heuristicResult.importance,
+      reason: 'Heuristic classification (AI response unclear)',
+    };
+  }
+
+  if (heuristicResult.confidence >= 0.7) {
+    return {
+      importance: heuristicResult.importance,
+      reason: 'Heuristic classification (high confidence)',
+    };
+  }
+
+  if (heuristicResult.importance === aiImportance) {
+    const reasonByLevel: Record<ImportanceLevel, string> = {
+      critical: 'AI + heuristics agree on critical content',
+      medium: 'AI + heuristics agree on important content',
+      low: 'AI + heuristics agree on general content',
+    };
+    return {
+      importance: aiImportance,
+      reason: reasonByLevel[aiImportance],
+    };
+  }
+
+  // For low-confidence disagreements, keep AI result instead of forcing medium.
+  return {
+    importance: aiImportance,
+    reason: 'AI classification used for ambiguous content',
   };
 }
 
