@@ -36,36 +36,65 @@ export function useHighlightAnalysis(): UseHighlightAnalysisReturn {
 
   const analyzeChunk = useCallback(
     async (chunk: string, index: number): Promise<AnalyzedChunk> => {
-      // STRICT prompt - most content should be "low" importance
-      const prompt = `Classify this text as:
-- "critical" ONLY if it contains URGENT info, warnings, key requirements, or critical steps
-- "medium" if somewhat important but not critical
-- "low" for most general/descriptive content (BE STRICT - most text is low)
-
-Text: ${chunk.slice(0, 600)}
-
-Answer with ONLY: critical, medium, or low`;
-
+      // HYBRID APPROACH: Use heuristics first, then AI for edge cases
+      
+      // Step 1: Check for obvious patterns with heuristics
+      const heuristicResult = analyzeWithHeuristics(chunk);
+      
+      // Step 2: If heuristics are confident, use them (faster!)
+      if (heuristicResult.confidence >= 0.8) {
+        return {
+          text: chunk,
+          importance: heuristicResult.importance,
+          reason: heuristicResult.reason,
+          chunkIndex: index,
+        };
+      }
+      
+      // Step 3: Use AI for uncertain cases with improved prompt
       try {
+        const truncated = chunk.slice(0, 500); // Shorter for speed
+        const prompt = `Text: "${truncated}"
+
+Rate as ONE WORD ONLY:
+- critical (warnings, errors, requirements, "must", "do not")
+- medium (tips, recommendations, "should", "important")  
+- low (descriptions, background, general info)
+
+Rating:`;
+
         const result = await TextGeneration.generate(prompt, {
-          maxTokens: 30, // Very short response for speed
-          temperature: 0.1, // Lower temp = more consistent
-          topP: 0.8,
-          topK: 10,
+          maxTokens: 10, // Very short - just one word
+          temperature: 0.05, // Very low for consistency
+          topP: 0.7,
+          topK: 5,
         });
 
         const response = result.text.toLowerCase().trim();
         
-        // STRICT parsing - default to low unless explicitly stated
+        // Parse AI response
         let importance: ImportanceLevel = 'low';
         let reason = 'General content';
 
-        if (response.startsWith('critical') || response.includes('critical:')) {
+        if (response.includes('critical')) {
           importance = 'critical';
-          reason = 'Contains critical information or requirements';
-        } else if (response.startsWith('medium') || response.includes('medium:')) {
+          reason = 'AI: Contains critical information';
+        } else if (response.includes('medium')) {
           importance = 'medium';
-          reason = 'Contains relevant supporting information';
+          reason = 'AI: Contains relevant information';
+        }
+        
+        // Combine AI with heuristics (weighted average)
+        // If they disagree, trust heuristics more
+        if (heuristicResult.confidence >= 0.5) {
+          // Weight: 60% heuristic, 40% AI
+          if (heuristicResult.importance === 'critical' && importance !== 'critical') {
+            importance = 'medium'; // Compromise
+            reason = 'Mixed signals - marked as important';
+          } else if (heuristicResult.importance === 'low' && importance === 'critical') {
+            importance = 'medium'; // Compromise
+            reason = 'Conflicting analysis - marked as important';
+          }
         }
 
         return {
@@ -76,11 +105,11 @@ Answer with ONLY: critical, medium, or low`;
         };
       } catch (err) {
         console.error(`Error analyzing chunk ${index}:`, err);
-        // Fallback: use heuristics
+        // Fallback to heuristics
         return {
           text: chunk,
-          importance: estimateImportanceHeuristic(chunk),
-          reason: 'Heuristic analysis',
+          importance: heuristicResult.importance,
+          reason: heuristicResult.reason,
           chunkIndex: index,
         };
       }
@@ -141,6 +170,123 @@ Answer with ONLY: critical, medium, or low`;
     progress,
     isAnalyzing,
     error,
+  };
+}
+
+/**
+ * Advanced heuristic analyzer with confidence scoring
+ * Returns both importance level and confidence (0-1)
+ */
+function analyzeWithHeuristics(text: string): {
+  importance: ImportanceLevel;
+  reason: string;
+  confidence: number;
+} {
+  const lowerText = text.toLowerCase();
+  const trimmed = text.trim();
+  
+  let criticalScore = 0;
+  let mediumScore = 0;
+  let confidence = 0;
+  
+  // === CRITICAL INDICATORS (High confidence) ===
+  
+  // Explicit warning labels (very high confidence)
+  if (/^(warning|caution|danger|critical|error|alert):/i.test(trimmed)) {
+    criticalScore += 10;
+    confidence = 0.95;
+  }
+  
+  // Strong prohibitions
+  if (lowerText.includes('do not ') || lowerText.includes('must not ') || 
+      lowerText.includes('never ') || lowerText.includes('forbidden')) {
+    criticalScore += 8;
+    confidence = Math.max(confidence, 0.9);
+  }
+  
+  // Mandatory requirements
+  if ((lowerText.includes('must ') || lowerText.includes('required')) &&
+      (lowerText.includes('immediately') || lowerText.includes('mandatory'))) {
+    criticalScore += 7;
+    confidence = Math.max(confidence, 0.85);
+  }
+  
+  // Time-sensitive urgency
+  if (lowerText.includes('within ') && /\d+\s*(hour|minute|day)/.test(lowerText)) {
+    criticalScore += 6;
+    confidence = Math.max(confidence, 0.8);
+  }
+  
+  // Security/safety terms
+  if (lowerText.includes('security breach') || lowerText.includes('data loss') ||
+      lowerText.includes('unauthorized access') || lowerText.includes('compromise')) {
+    criticalScore += 6;
+    confidence = Math.max(confidence, 0.8);
+  }
+  
+  // === MEDIUM INDICATORS (Medium confidence) ===
+  
+  // Explicit importance labels
+  if (/^(important|note|tip|recommendation|best practice):/i.test(trimmed)) {
+    mediumScore += 8;
+    confidence = Math.max(confidence, 0.85);
+  }
+  
+  // Advisory language
+  if (lowerText.includes('should ') || lowerText.includes('recommend') ||
+      lowerText.includes('advised') || lowerText.includes('suggest')) {
+    mediumScore += 5;
+    confidence = Math.max(confidence, 0.7);
+  }
+  
+  // Numbered/structured content (often important)
+  if (/^\d+\.\s+[A-Z]/.test(trimmed) || /^[A-Z][^.!?]{5,60}:/.test(trimmed)) {
+    mediumScore += 4;
+    confidence = Math.max(confidence, 0.65);
+  }
+  
+  // Action verbs (indicates instructions)
+  const actionVerbs = ['ensure', 'verify', 'check', 'confirm', 'review', 'validate'];
+  if (actionVerbs.some(verb => lowerText.includes(verb + ' '))) {
+    mediumScore += 3;
+    confidence = Math.max(confidence, 0.6);
+  }
+  
+  // === CLASSIFY ===
+  
+  // Critical if high critical score
+  if (criticalScore >= 6) {
+    return {
+      importance: 'critical',
+      reason: 'Contains warnings, requirements, or urgent information',
+      confidence,
+    };
+  }
+  
+  // Medium if medium score high enough or some critical signals
+  if (mediumScore >= 6 || criticalScore >= 3) {
+    return {
+      importance: 'medium',
+      reason: 'Contains important information or instructions',
+      confidence: confidence || 0.65,
+    };
+  }
+  
+  // Check if it's likely just background/descriptive
+  const lowIndicators = [
+    'background', 'introduction', 'history', 'overview',
+    'for example', 'such as', 'this document', 'the system'
+  ];
+  
+  if (lowIndicators.some(indicator => lowerText.includes(indicator))) {
+    confidence = Math.max(confidence, 0.7);
+  }
+  
+  // Default to low
+  return {
+    importance: 'low',
+    reason: 'General or descriptive content',
+    confidence: confidence || 0.5,
   };
 }
 
