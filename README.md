@@ -4,7 +4,7 @@ DocuMentor is an offline, privacy-first document assistant that runs entirely in
 
 Designed for real-world sensitive reading and writing workflows (insurance documents, policies, contracts, academic drafts, internal technical docs), all AI processing in DocuMentor occurs entirely on-device (via WebAssembly and WebGPU) — no server-side inference, no API keys, and no telemetry.
 
-## 🚀 Key Features
+## Key Features
 
 DocuMentor focuses on three core experiences:
 
@@ -26,14 +26,14 @@ DocuMentor focuses on three core experiences:
 - **Debate Mode:** Acts as a devil's advocate to your arguments by identifying logical gaps and offering counter-points.
 - **Writing Mode:** Transitions from critique to feedback, offering tangible structural and clarity improvements for your academic or technical drafts.
 
-### 🛡️ Pre-computation Privacy Scanner
+### Pre-computation Privacy Scanner
 Before any document is passed to the AI runtimes, DocuMentor runs an aggressive local regex scan to catch leaked secrets:
 - **Critical Secrets:** AWS keys, Stripe secrets, Private Keys, GitHub endpoints.
 - **High Sensitivity:** JWTs, Database URIs, exposed `.env` variables.
 - **Medium/Low Sensitivity:** Emails, Phone Numbers, IP Addresses.
 - **Actionable UI:** Users are stopped by a modal UI requiring explicit acknowledgment or remediation of found secrets before analysis continues.
 
-## 💻 Tech Stack
+## Tech Stack
 
 | Layer | Technology | Purpose |
 |---|---|---|
@@ -46,13 +46,13 @@ Before any document is passed to the AI runtimes, DocuMentor runs an aggressive 
 | **Local Audio Backend**| `@runanywhere/web-onnx` | ONNX runtime backend registration (STT/TTS capabilities) |
 | **Deployment** | Vercel | SPA hosting configured with Cross-Origin Isolation headers required for SharedArrayBuffer |
 
-## 🌟 RunAnywhere AI Integration
+## RunAnywhere AI Integration
 The AI orchestration uses the `@runanywhere` suite to keep workloads on the client.
 - **Worker Architecture:** AI inference runs inside a Web Worker thread (`src/workers/vlm-worker.ts`), preventing UI stutter during heavy token generation.
 - **Model Caching:** Models are downloaded directly from HuggingFace to the browser's Origin Private File System (OPFS).
 - **Graceful Loading:** A robust UI layer (via `ModelBanner`) monitors loading progress, from fetching bytes to transferring GPU buffers, enabling a smooth user experience even on a cold start.
 
-## 🛠️ Quick Start
+## Quick Start
 
 ```bash
 # Install dependencies
@@ -76,7 +76,7 @@ npm run build
 npm run preview
 ```
 
-## 📂 Source Walkthrough
+## Source Walkthrough
 
 ```text
 src/
@@ -106,7 +106,7 @@ src/
     └── vlm-worker.ts         # Off-main-thread Web Worker for model inference
 ```
 
-## ☁️ Deployment Requirements
+## Deployment Requirements
 
 This application relies heavily on `SharedArrayBuffer` for multi-threaded WASM and WebGPU speed.
 For production deployments, ensure the host (e.g. Vercel) includes these headers:
@@ -116,5 +116,3 @@ Cross-Origin-Embedder-Policy: credentialless
 ```
 *(DocuMentor achieves this out-of-the-box via `vercel.json`).*
 
-## License
-MIT

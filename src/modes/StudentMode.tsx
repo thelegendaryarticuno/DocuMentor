@@ -193,8 +193,7 @@ export function StudentMode() {
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
-        background:
-          'radial-gradient(circle at top left, rgba(14, 165, 233, 0.18), transparent 28%), linear-gradient(180deg, #F8FAFC 0%, #E2E8F0 100%)',
+        background: 'var(--bg-page)',
       }}
     >
       <header
@@ -203,17 +202,16 @@ export function StudentMode() {
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '14px 18px',
-          borderBottom: '1px solid rgba(148, 163, 184, 0.32)',
-          background: 'rgba(255, 255, 255, 0.82)',
-          backdropFilter: 'blur(12px)',
+          borderBottom: '1px solid var(--border-subtle)',
+          background: 'var(--bg-surface)',
           position: 'sticky',
           top: 0,
           zIndex: 20,
         }}
       >
         <div>
-          <h1 style={{ margin: 0, fontSize: '22px', color: '#0F172A' }}>Guided Study Mode</h1>
-          <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#475569' }}>
+          <h1 style={{ margin: 0, fontSize: '22px', color: 'var(--text-primary)', fontFamily: 'var(--font-display)', fontWeight: 700 }}>Guided Study Mode</h1>
+          <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}>
             Session-only source memory, grounded lesson cards, and hands-on practice for docs that teach by doing.
           </p>
         </div>
@@ -243,10 +241,9 @@ export function StudentMode() {
         <section
           className="guided-study-sidebar"
           style={{
-            border: '1px solid rgba(148, 163, 184, 0.28)',
-            borderRadius: '24px',
-            background: 'rgba(255, 255, 255, 0.88)',
-            boxShadow: '0 18px 40px rgba(15, 23, 42, 0.08)',
+            border: '1px solid var(--border-subtle)',
+            borderRadius: 'var(--rl)',
+            background: 'var(--bg-surface)',
             padding: '18px',
             display: 'flex',
             flexDirection: 'column',
@@ -261,27 +258,27 @@ export function StudentMode() {
         >
           <div style={{ display: 'grid', gap: '6px' }}>
             <p style={labelStyle}>Student source</p>
-            <h2 style={{ margin: 0, color: '#0F172A', fontSize: '24px' }}>Teach from a confusing chunk</h2>
-            <p style={{ margin: 0, color: '#64748B', lineHeight: 1.6, fontSize: '14px' }}>
+            <h2 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '24px', fontFamily: 'var(--font-display)', fontWeight: 700 }}>Teach from a confusing chunk</h2>
+            <p style={{ margin: 0, color: 'var(--text-secondary)', lineHeight: 1.6, fontSize: '14px', fontFamily: 'var(--font-body)' }}>
               Best speed comes from keeping the source under about 800 words. Highlight a subsection if only one part is confusing.
             </p>
           </div>
 
           <div
             style={{
-              borderRadius: '18px',
-              border: '1px solid rgba(14, 165, 233, 0.18)',
-              background: 'linear-gradient(135deg, rgba(14, 165, 233, 0.08), rgba(99, 102, 241, 0.05))',
+              borderRadius: 'var(--rx)',
+              border: '1px solid var(--border-subtle)',
+              background: 'var(--bg-raised)',
               padding: '14px',
               display: 'grid',
               gap: '8px',
             }}
           >
-            <p style={{ margin: 0, color: '#0F172A', fontWeight: 700 }}>Privacy</p>
-            <p style={{ margin: 0, color: '#475569', lineHeight: 1.6, fontSize: '14px' }}>
+            <p style={{ margin: 0, color: 'var(--text-primary)', fontWeight: 700, fontFamily: 'var(--font-display)' }}>Privacy</p>
+            <p style={{ margin: 0, color: 'var(--text-secondary)', lineHeight: 1.6, fontSize: '14px', fontFamily: 'var(--font-body)' }}>
               Your lesson source is kept only in <code>sessionStorage</code> for this browser tab. Clear Session removes it immediately.
             </p>
-            <p style={{ margin: 0, color: '#475569', lineHeight: 1.6, fontSize: '14px' }}>
+            <p style={{ margin: 0, color: 'var(--text-secondary)', lineHeight: 1.6, fontSize: '14px', fontFamily: 'var(--font-body)' }}>
               Downloaded webpage support: saved <code>.html</code>/<code>.htm</code> files are converted into readable text before teaching.
             </p>
           </div>
@@ -299,13 +296,14 @@ export function StudentMode() {
             style={{
               minHeight: '320px',
               resize: 'vertical',
-              borderRadius: '18px',
-              border: '1px solid #CBD5E1',
+              borderRadius: 'var(--rl)',
+              border: '1px solid var(--border-subtle)',
               padding: '14px',
               fontSize: '14px',
               lineHeight: 1.7,
-              color: '#0F172A',
-              background: '#FFFFFF',
+              color: 'var(--text-primary)',
+              background: 'var(--bg-surface)',
+              fontFamily: 'var(--font-body)',
             }}
           />
 
@@ -369,20 +367,20 @@ export function StudentMode() {
 
           <div
             style={{
-              border: '1px dashed #94A3B8',
-              borderRadius: '18px',
+              border: '1px dashed var(--border-subtle)',
+              borderRadius: 'var(--rl)',
               padding: '14px',
-              background: '#F8FAFC',
-              color: '#334155',
+              background: 'var(--bg-raised)',
+              color: 'var(--text-secondary)',
               fontSize: '14px',
               lineHeight: 1.6,
             }}
           >
-            <p style={{ margin: 0, fontWeight: 800, color: '#0F172A' }}>Selection-aware teaching</p>
-            <p style={{ margin: '6px 0 0 0' }}>
+            <p style={{ margin: 0, fontWeight: 800, color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>Selection-aware teaching</p>
+            <p style={{ margin: '6px 0 0 0', fontFamily: 'var(--font-body)' }}>
               Highlight a subsection, then teach just that part so the model spends its context on the exact confusing bit.
             </p>
-            <p style={{ margin: '8px 0 0 0', color: '#475569' }}>
+            <p style={{ margin: '8px 0 0 0', color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}>
               {selectedText
                 ? `Preview: ${sourcePreview}${selectedText.length > sourcePreview.length ? '...' : ''}`
                 : 'No highlighted subsection yet. The full source will be used.'}
@@ -391,14 +389,15 @@ export function StudentMode() {
 
           <div
             style={{
-              border: '1px solid #E2E8F0',
-              borderRadius: '18px',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: 'var(--rl)',
               padding: '14px',
-              background: '#FFFFFF',
+              background: 'var(--bg-surface)',
               display: 'grid',
               gap: '6px',
-              color: '#334155',
+              color: 'var(--text-secondary)',
               fontSize: '14px',
+              fontFamily: 'var(--font-body)',
             }}
           >
             <p style={{ margin: 0 }}>File: {filename ?? 'None'}</p>
@@ -453,16 +452,16 @@ function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div
       style={{
-        borderRadius: '18px',
-        background: '#FFFFFF',
-        border: '1px solid rgba(148, 163, 184, 0.28)',
+        borderRadius: 'var(--rl)',
+        background: 'var(--bg-surface)',
+        border: '1px solid var(--border-subtle)',
         padding: '14px',
       }}
     >
-      <p style={{ margin: 0, color: '#64748B', fontSize: '12px', fontWeight: 800, textTransform: 'uppercase' }}>
+      <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', fontFamily: 'var(--font-display)' }}>
         {label}
       </p>
-      <p style={{ margin: '8px 0 0 0', color: '#0F172A', fontSize: '22px', fontWeight: 800 }}>{value}</p>
+      <p style={{ margin: '8px 0 0 0', color: 'var(--text-primary)', fontSize: '22px', fontWeight: 800, fontFamily: 'var(--font-display)' }}>{value}</p>
     </div>
   );
 }
@@ -494,22 +493,24 @@ function extractTeachableUploadText(filename: string, rawText: string): string {
 
 const labelStyle = {
   margin: 0,
-  color: '#0284C7',
+  color: 'var(--accent)',
   fontWeight: 800,
   fontSize: '12px',
   letterSpacing: '0.08em',
   textTransform: 'uppercase' as const,
+  fontFamily: 'var(--font-display)',
 };
 
 const ghostButtonStyle = {
-  border: '1px solid #94A3B8',
-  background: '#FFFFFF',
-  color: '#0F172A',
+  border: '1px solid var(--border-subtle)',
+  background: 'var(--bg-surface)',
+  color: 'var(--text-primary)',
   borderRadius: '999px',
   padding: '10px 14px',
   cursor: 'pointer',
   fontWeight: 700,
   fontSize: '13px',
+  fontFamily: 'var(--font-body)',
 };
 
 function ghostButtonStyleDisabled(disabled: boolean) {
@@ -523,36 +524,39 @@ function ghostButtonStyleDisabled(disabled: boolean) {
 function primaryButtonStyle(enabled: boolean) {
   return {
     border: 'none',
-    background: enabled ? 'linear-gradient(90deg, #0284C7, #0EA5E9)' : '#94A3B8',
+    background: enabled ? 'var(--accent)' : 'var(--border-subtle)',
     color: '#FFFFFF',
     borderRadius: '999px',
     padding: '11px 16px',
     cursor: enabled ? 'pointer' : 'not-allowed',
     fontWeight: 800,
     fontSize: '13px',
+    fontFamily: 'var(--font-display)',
   };
 }
 
 function secondaryPrimaryButtonStyle(enabled: boolean) {
   return {
     border: 'none',
-    background: enabled ? 'linear-gradient(90deg, #0F172A, #334155)' : '#94A3B8',
+    background: enabled ? 'var(--text-primary)' : 'var(--border-subtle)',
     color: '#FFFFFF',
     borderRadius: '999px',
     padding: '11px 16px',
     cursor: enabled ? 'pointer' : 'not-allowed',
     fontWeight: 800,
     fontSize: '13px',
+    fontFamily: 'var(--font-display)',
   };
 }
 
 const dangerGhostButtonStyle = {
   border: '1px solid #FCA5A5',
-  background: '#FFFFFF',
+  background: 'var(--bg-surface)',
   color: '#B91C1C',
   borderRadius: '999px',
   padding: '10px 14px',
   cursor: 'pointer',
   fontWeight: 700,
   fontSize: '13px',
+  fontFamily: 'var(--font-body)',
 };
