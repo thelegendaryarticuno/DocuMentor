@@ -91,10 +91,12 @@ export function ChatTab() {
 
   return (
     <div className="tab-panel chat-panel">
-      <ModelBanner
-        progress={loader.progress * 100}
-        modelName="LLM"
-      />
+      {loader.state !== 'ready' && (
+        <ModelBanner
+          progress={loader.progress * 100}
+          modelName="LLM"
+        />
+      )}
 
       <div className="message-list" ref={listRef}>
         {messages.length === 0 && (

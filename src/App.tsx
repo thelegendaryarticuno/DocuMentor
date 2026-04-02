@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { ModelCategory } from '@runanywhere/web';
 import { initSDK } from './runanywhere';
+import { AppBootScreen } from './components/AppBootScreen';
 import { Sidebar } from './components/Sidebar';
-import { ModelBanner } from './components/ModelBanner';
 import { ResearchMode } from './modes/ResearchMode';
 import { StudentMode } from './modes/StudentMode';
 import { SmartHighlightsMode } from './modes/SmartHighlightsMode';
@@ -33,6 +33,10 @@ export function App() {
     }
   }, [loader.ensure, sdkReady]);
 
+  const retryModelStartup = () => {
+    appLevelModelEnsurePromise = loader.ensure();
+  };
+
   if (sdkError) {
     return (
       <div className="app-loading">
@@ -49,6 +53,17 @@ export function App() {
         <h2>Loading RunAnywhere SDK...</h2>
         <p>Initializing on-device AI engine</p>
       </div>
+    );
+  }
+
+  if (loader.state !== 'ready') {
+    return (
+      <AppBootScreen
+        state={loader.state}
+        progress={loader.progress * 100}
+        error={loader.error}
+        onRetry={retryModelStartup}
+      />
     );
   }
 
@@ -71,16 +86,11 @@ export function App() {
         activePath={location.pathname}
         onNavigate={(path) => (window.location.href = path)}
         isModelReady={loader.state === 'ready'}
-        isModelLoading={loader.state === 'downloading' || loader.state === 'loading'}
+        isModelLoading={false}
       />
 
       {/* Main Area */}
       <div className="main-area">
-        {/* Model Banner - only show when loading */}
-        {loader.state === 'downloading' && (
-          <ModelBanner progress={loader.progress * 100} modelName="Language Model" totalMB={4096} />
-        )}
-
         {/* Tab Bar */}
         <div className="tab-bar">
           <button
