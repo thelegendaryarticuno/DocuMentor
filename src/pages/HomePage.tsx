@@ -248,7 +248,7 @@ const cardPrimaryButtonStyle = {
   border: 'none',
   borderRadius: '999px',
   padding: '11px 16px',
-  background: 'var(--text-primary)',
+  background: 'var(--accent)',
   color: '#FFFFFF',
   fontWeight: 800,
   fontSize: '13px',

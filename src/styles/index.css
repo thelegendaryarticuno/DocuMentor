@@ -340,7 +340,7 @@ body {
 }
 
 .tab-button.active {
-  color: #FFFFFF;
+  color: var(--text-primary);
   border-bottom-color: var(--accent);
   font-weight: 500;
 }
