@@ -19,10 +19,12 @@ export function Home() {
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#FFFFFF' }}>
-      <ModelBanner
-        progress={loader.progress * 100}
-        modelName="LLM"
-      />
+      {loader.state !== 'ready' && (
+        <ModelBanner
+          progress={loader.progress * 100}
+          modelName="LLM"
+        />
+      )}
       
       <div style={{ 
         paddingBottom: '100px',
